@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+}
+
+/* チェック済みの項目を目立たせる */
+.yokai-item.checked {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(22, 163, 74, 0.5);
+}

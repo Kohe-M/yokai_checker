@@ -1,0 +1,79 @@
+name: CI/CD
+
+# PR を作ると check が走り、main にマージされると check の後に deploy が走る。
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  # 同じブランチへの連続pushでは古い実行を打ち切る。ただし main は
+  # デプロイが途中で止まると困るので打ち切らない。
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  check:
+    name: チェック
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - name: 静的チェック
+        run: npm run check
+
+      - name: 埋め込みCSSが最新か確認
+        run: |
+          npm run build
+          if ! git diff --quiet -- public/index.html; then
+            echo "::error file=public/index.html::埋め込みCSSが古くなっています。ローカルで npm run build を実行し、public/index.html をコミットしてください。"
+            git diff --stat -- public/index.html
+            exit 1
+          fi
+
+      - name: wrangler 設定の検証
+        # --dry-run は認証情報を必要としないので、PR でも実行できる。
+        run: npx wrangler deploy --dry-run
+
+  deploy:
+    name: デプロイ
+    needs: check
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+
+      - name: 公開URLをサマリーに出す
+        run: |
+          echo "公開URL: ${{ steps.deploy.outputs.deployment-url }}" >> "$GITHUB_STEP_SUMMARY"
