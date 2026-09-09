@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>妖怪ウォッチ2 妖怪ゲットチェッカー</title>
-    <!-- Tailwind CSSを読み込みます -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap">
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
-        /* フォントや基本的なスタイル設定 */
-        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap');
         body {
             font-family: 'M PLUS Rounded 1c', sans-serif;
         }
-        /* チェックを入れた項目をより目立たせるためのカスタムスタイル */
+        /* チェック済みの項目を目立たせる */
         .yokai-item.checked {
             transform: scale(1.02);
             box-shadow: 0 0 15px rgba(22, 163, 74, 0.5);
@@ -21,25 +23,23 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- ヘッダーエリア -->
     <header class="bg-red-600 text-white p-4 sticky top-0 z-10 shadow-lg">
         <div class="container mx-auto flex justify-between items-center">
             <h1 class="text-xl md:text-2xl font-bold">妖怪ウォッチ2 妖怪ゲットチェッカー</h1>
             <div class="flex items-center space-x-2">
-                <button id="save-button" class="bg-white text-red-600 font-bold py-2 px-4 rounded-lg hover:bg-red-100 transition-colors shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
+                <button id="save-button" type="button" class="bg-white text-red-600 font-bold py-2 px-4 rounded-lg hover:bg-red-100 transition-colors shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
                     保存
                 </button>
                 <label for="load-input" class="cursor-pointer bg-white text-red-600 font-bold py-2 px-4 rounded-lg hover:bg-red-100 transition-colors shadow-md">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                     読込
                 </label>
-                <input type="file" id="load-input" accept=".json" class="hidden">
+                <input type="file" id="load-input" accept=".json,application/json" class="hidden">
             </div>
         </div>
     </header>
 
-    <!-- メインコンテンツ -->
     <main class="container mx-auto p-4 md:p-6">
         <div class="bg-white p-4 rounded-lg shadow-md mb-6">
             <p class="font-bold">使い方：</p>
@@ -48,211 +48,222 @@
                 <li>進捗を保存したいときは「保存」ボタンを押すと、データファイルがダウンロードされます。</li>
                 <li>続きから再開するときは「読込」ボタンを押し、保存したファイルを選択してください。</li>
             </ol>
-             <div id="progress-container" class="mt-4">
-                <p class="font-bold text-lg">達成率: <span id="progress-text">0 / 231 (0.00%)</span></p>
-                <div class="w-full bg-gray-200 rounded-full h-4 mt-1">
+            <div class="mt-4">
+                <p class="font-bold text-lg">達成率: <span id="progress-text">-</span></p>
+                <div id="progress-bar-track" class="w-full bg-gray-200 rounded-full h-4 mt-1" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="達成率">
                     <div id="progress-bar" class="bg-green-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
                 </div>
             </div>
         </div>
 
-        <!-- 妖怪リスト -->
-        <div id="yokai-list" class="space-y-6">
-            <!-- JavaScriptによって妖怪リストがここに挿入されます -->
-        </div>
+        <!-- 妖怪リストは JavaScript がテンプレートから生成します -->
+        <div id="yokai-list" class="space-y-6"></div>
     </main>
 
-    <!-- 通知用モーダル -->
-    <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 p-4">
+    <div id="notification-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-20 p-4" role="dialog" aria-modal="true" aria-labelledby="notification-message">
         <div class="bg-white rounded-lg p-6 shadow-xl text-center">
             <p id="notification-message" class="text-lg mb-4"></p>
-            <button id="notification-close" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition-colors">閉じる</button>
+            <button id="notification-close" type="button" class="bg-red-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-red-700 transition-colors">閉じる</button>
         </div>
     </div>
 
+    <template id="tribe-template">
+        <section class="bg-white p-4 rounded-lg shadow-md">
+            <h2 class="tribe-name text-2xl font-bold mb-4 pb-2 border-b-2 border-red-500"></h2>
+            <div class="tribe-members grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+        </section>
+    </template>
+
+    <template id="yokai-item-template">
+        <label class="yokai-item flex items-center cursor-pointer bg-gray-50 p-3 rounded-lg border border-gray-200 transition-all duration-300">
+            <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500">
+            <span class="yokai-name ml-3 text-sm md:text-base"></span>
+        </label>
+    </template>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const yokaiData = [
-                { tribe: "イサマシ族", members: ["ぶようじん坊", "がらあきん坊", "さきがけの助", "ダラケ刀", "ザンバラ刀", "ダララだんびら", "かたづ家来", "アライ魔将", "獅子まる", "万尾獅子", "おこ武者", "くしゃ武者", "なまはげ", "ちからモチ", "やきもチ", "あかなめ", "おにぎり侍", "焼きおにぎり", "カブトさん", "ゲンマ将軍", "黄泉ゲンスイ", "泥田坊", "ブリー隊長", "メラメライオン", "グラグライオン", "とどろき獅子", "しょうブシ", "まさむね", "むらまさ", "くさなぎ", "ベンケイ", "からくりベンケイ", "やまと", "カブキ猿", "クワノ武士", "クワガ大将", "オオクワノ神", "鬼食い", "いのちとり"] },
-                { tribe: "フシギ族", members: ["さかさっ傘", "化け草履", "ズルズルづる", "かぜカモ", "つづかな僧", "やめたい師", "もうせん和尚", "わすれん帽", "メゾン・ドワスレ", "ばか頭巾", "のっぺら坊", "わらえ姉", "青くちびる", "バクロ婆", "ババァーン", "ドクロ婆", "モテモ天", "モテマクール", "モテヌス", "一旦ゴメン", "あやまり倒し", "こえんら", "えんらえんら", "でんぱく小僧", "でんじん", "はつでんしん", "おでんじん", "USO", "アペリカン", "うんがい鏡", "うんがい三面鏡", "ヤミ鏡", "まぼ老師", "かげ老師", "ほう老師", "さとりちゃん", "よつめ", "セバスチャン", "天狗", "ほむら天狗", "キュウビ", "犬神", "ぬえ", "風魔猿"] },
-                { tribe: "ゴーケツ族", members: ["ドキ土器", "だるだるま", "だるまっちょ", "ゴリだるま", "うらや飯", "プライ丼", "迷い車", "だっせんしゃ", "ムリカベ", "むりだ城", "シロカベ", "グレるりん", "ゴクドー", "アニ鬼", "ヨロイさん", "モノマネキン", "トオセンボン", "くるがねセンボン", "モレゾウ", "ブルファント", "カマンモス", "雷蔵", "ヒライ神", "あせっか鬼", "ふじのやま", "さくらのじま", "ドウカク", "ギンカク", "キンカク", "プラチナカク", "武者かぶと", "カブト無双", "オオツノノ神", "ロボニャン", "ゴルニャン", "だいだらぼっち", "うみぼうず", "大ガマ", "大やもり"] },
-                { tribe: "プリチー族", members: ["ひきゃく", "しゃれこ婦人", "カラカラさん", "ほね美人", "セミまる", "カゲまる", "ヒグラシまる", "さむガリ", "ガリ王子", "あつガルル", "つらがわり", "一つ目小僧", "ジバニャン", "トゲニャン", "ワルニャン", "ブチニャン", "ノガッパ", "たびガッパ", "なみガッパ", "コマさん", "ししコマ", "コマじろう", "とらじろう", "バク", "おバク様", "ハク", "雨女", "ばくそく", "キュン太郎", "ズキュキュン太", "裏キュン太", "ケマモン", "ゆきおんな", "ふぶき姫", "百鬼姫", "河童", "水虎", "マスターニャーダ"] },
-                { tribe: "ポカポカ族", members: ["うらやましろう", "つまみぐいのすけ", "ワカメくん", "ワカメ☆スター", "コンブさん", "メカブちゃん", "ひも爺", "くいい爺", "こめ爺", "キズナメコ", "キズナース", "砂夫", "大山砂夫", "から傘お化け", "から傘魔人", "びんボーイ", "お金ナイダー", "らくてん童", "ざしきわらし", "ざしきわら神", "ぜっこう蝶", "ゼッコウ蝶", "サイコウ蝶", "アゲアゲハ", "くだん", "大くだん", "どんちゃん", "晴れ男", "ホノボーノ", "ヒョウヘンヌ", "ヒョウヘンナ", "サンタク老師", "ふくろじじい", "さいの目入道", "ゾロ目大明神", "雷オトン", "絶オジイ", "聖オカン", "心オバア", "麒麟", "イッカク"] },
-                { tribe: "ウスラカゲ族", members: ["みちび鬼", "えこひい鬼", "かたのり小僧", "かたのり親方", "ぎっくり男", "TETSUYA", "KANTETSU", "草くいおとこ", "肉くい男", "ネガティブーン", "ジャネガブーン", "かゆかゆ", "ジミー", "カゲロー", "カイム", "ぎしんあん鬼", "ガ鬼", "あまのじゃく", "ヒキコウモリ", "ドジコウモリ", "ヤドコウモリ", "かりパックン", "泥ボックン", "まてんし", "ひとまか仙人", "りもこんかくし", "ジコチュウ", "ネクラマテング", "ヨミテング", "リー夫人", "ミツマタノヅチ", "ガブニャン", "魔ガサス", "ウ魔", "デビビル", "デビビラン", "虫歯伯爵", "百々目鬼", "きらめき鬼", "ドケチング", "ヤミまろ", "どんどろ"] },
-                { tribe: "ブキミー族", members: ["イガイガグリ", "チクチクウニ", "じめりんぼう", "雨ふらし", "こおりんぼう", "化けあられ", "たらりん", "ヨコドリ", "ぶんぶん鳥", "はらおドリ", "おともらし", "爆音ならし", "トホホギス", "ブカッコウ", "死神鳥", "じんめん犬", "かおベロス", "三途の犬", "けうけげん", "ふさふさん", "認MEN", "ドンヨリーヌ", "口だけおんな", "おつぼね様", "じがじぃさん", "のらりくらり", "おならず者", "へこ鬼神", "花子さん", "呪野花子", "のぼせトンマン", "おすべり様", "おしっしょう", "しわくちゃん", "老いらん", "ふじみ御前", "フゥミン", "おねむの精", "土蜘蛛", "女郎蜘蛛"] },
-                { tribe: "ニョロロン族", members: ["ねちがえる", "ツチノコ", "フクリュウ", "ツチノコパンダ", "からみぞん", "こんがらギャル", "笑ウツボ", "歌ウナギ", "大蛇のツボ", "キライギョ", "ゾウオ", "ギャクジョウオ", "おもいだスッポン", "おもいだ神", "ムカムカデ", "激ドラゴン", "りゅーくん", "龍神", "青龍", "にんぎょ", "八百比丘尼", "イザナミ", "ろくろ首", "ボー坊", "しどろもどろ", "ミチクサメ", "トーシロザメ", "ムダヅカイ", "はらわシェル", "ナガバナ", "ナガバナナ", "ホリュウ", "つられたろう丸", "しきるん蛇", "すねスネーク", "まむし行司", "オロチ", "影オロチ"] },
-                { tribe: "その他", members: ["ブシニャン", "しゅらコマ", "山吹鬼", "ネタバレリーナ", "花さか爺", "うんちく魔", "イケメン犬", "やまタン", "サファイニャン", "エメラルニャン", "ルビーニャン", "トパニャン", "ダイヤニャン", "メロンニャン", "ミカンニャン", "キウイニャン", "ブドウニャン", "イチゴニャン", "スイカニャン", "ロボガッパ", "ロボコマ", "ロボG", "ロボメン犬", "ロボノコ", "ロボりゅーくん", "ワンダーニャン", "ロボニャンF型", "セーラーニャン", "マスクドニャーン", "フユニャン", "ダークニャン", "ジバコマ", "ジェットニャン", "厄怪", "不怪", "豪怪", "難怪", "破怪", "あかなめ・怪", "泥田坊・怪", "えんらえんら・怪", "河童・怪", "から傘お化け・怪", "ざしきわらし・怪", "くだん・怪", "けうけげん・怪", "にんぎょ・怪", "ろくろ首・怪", "ジンギスカン", "チンギスハン", "寝ブタ", "ねぶた", "江戸っ子パンダ", "大江戸忍者パンダ", "ひつま武士", "ひまつ武士", "たこやっ鬼", "たこや鬼神", "砂ン丘入道", "ノー砂ン丘入道", "すもうどん", "横砂うどん", "あっそう山", "あそっ火山", "ウキウキビ", "トキメキビ", "ハナホ人", "妖怪ガッツK", "妖怪ガッツF", "ジバニャンS", "コマさんS", "コマじろうS", "ヤミキュウビ", "ヒカリオロチ", "赤鬼", "青鬼", "黒鬼"] }
-            ];
+    'use strict';
 
-            const yokaiListContainer = document.getElementById('yokai-list');
-            const saveButton = document.getElementById('save-button');
-            const loadInput = document.getElementById('load-input');
-            const progressText = document.getElementById('progress-text');
-            const progressBar = document.getElementById('progress-bar');
-            
-            // 通知モーダル関連
-            const modal = document.getElementById('notification-modal');
-            const modalMessage = document.getElementById('notification-message');
-            const modalClose = document.getElementById('notification-close');
+    // 妖怪ウォッチ2 の妖怪一覧（族ごと）。妖怪データの唯一の置き場所。
+    const YOKAI_TRIBES = [
+        { tribe: "イサマシ族", members: ["ぶようじん坊", "がらあきん坊", "さきがけの助", "ダラケ刀", "ザンバラ刀", "ダララだんびら", "かたづ家来", "アライ魔将", "獅子まる", "万尾獅子", "おこ武者", "くしゃ武者", "なまはげ", "ちからモチ", "やきもチ", "あかなめ", "おにぎり侍", "焼きおにぎり", "カブトさん", "ゲンマ将軍", "黄泉ゲンスイ", "泥田坊", "ブリー隊長", "メラメライオン", "グラグライオン", "とどろき獅子", "しょうブシ", "まさむね", "むらまさ", "くさなぎ", "ベンケイ", "からくりベンケイ", "やまと", "カブキ猿", "クワノ武士", "クワガ大将", "オオクワノ神", "鬼食い", "いのちとり"] },
+        { tribe: "フシギ族", members: ["さかさっ傘", "化け草履", "ズルズルづる", "かぜカモ", "つづかな僧", "やめたい師", "もうせん和尚", "わすれん帽", "メゾン・ドワスレ", "ばか頭巾", "のっぺら坊", "わらえ姉", "青くちびる", "バクロ婆", "ババァーン", "ドクロ婆", "モテモ天", "モテマクール", "モテヌス", "一旦ゴメン", "あやまり倒し", "こえんら", "えんらえんら", "でんぱく小僧", "でんじん", "はつでんしん", "おでんじん", "USO", "アペリカン", "うんがい鏡", "うんがい三面鏡", "ヤミ鏡", "まぼ老師", "かげ老師", "ほう老師", "さとりちゃん", "よつめ", "セバスチャン", "天狗", "ほむら天狗", "キュウビ", "犬神", "ぬえ", "風魔猿"] },
+        { tribe: "ゴーケツ族", members: ["ドキ土器", "だるだるま", "だるまっちょ", "ゴリだるま", "うらや飯", "プライ丼", "迷い車", "だっせんしゃ", "ムリカベ", "むりだ城", "シロカベ", "グレるりん", "ゴクドー", "アニ鬼", "ヨロイさん", "モノマネキン", "トオセンボン", "くるがねセンボン", "モレゾウ", "ブルファント", "カマンモス", "雷蔵", "ヒライ神", "あせっか鬼", "ふじのやま", "さくらのじま", "ドウカク", "ギンカク", "キンカク", "プラチナカク", "武者かぶと", "カブト無双", "オオツノノ神", "ロボニャン", "ゴルニャン", "だいだらぼっち", "うみぼうず", "大ガマ", "大やもり"] },
+        { tribe: "プリチー族", members: ["ひきゃく", "しゃれこ婦人", "カラカラさん", "ほね美人", "セミまる", "カゲまる", "ヒグラシまる", "さむガリ", "ガリ王子", "あつガルル", "つらがわり", "一つ目小僧", "ジバニャン", "トゲニャン", "ワルニャン", "ブチニャン", "ノガッパ", "たびガッパ", "なみガッパ", "コマさん", "ししコマ", "コマじろう", "とらじろう", "バク", "おバク様", "ハク", "雨女", "ばくそく", "キュン太郎", "ズキュキュン太", "裏キュン太", "ケマモン", "ゆきおんな", "ふぶき姫", "百鬼姫", "河童", "水虎", "マスターニャーダ"] },
+        { tribe: "ポカポカ族", members: ["うらやましろう", "つまみぐいのすけ", "ワカメくん", "ワカメ☆スター", "コンブさん", "メカブちゃん", "ひも爺", "くいい爺", "こめ爺", "キズナメコ", "キズナース", "砂夫", "大山砂夫", "から傘お化け", "から傘魔人", "びんボーイ", "お金ナイダー", "らくてん童", "ざしきわらし", "ざしきわら神", "ぜっこう蝶", "ゼッコウ蝶", "サイコウ蝶", "アゲアゲハ", "くだん", "大くだん", "どんちゃん", "晴れ男", "ホノボーノ", "ヒョウヘンヌ", "ヒョウヘンナ", "サンタク老師", "ふくろじじい", "さいの目入道", "ゾロ目大明神", "雷オトン", "絶オジイ", "聖オカン", "心オバア", "麒麟", "イッカク"] },
+        { tribe: "ウスラカゲ族", members: ["みちび鬼", "えこひい鬼", "かたのり小僧", "かたのり親方", "ぎっくり男", "TETSUYA", "KANTETSU", "草くいおとこ", "肉くい男", "ネガティブーン", "ジャネガブーン", "かゆかゆ", "ジミー", "カゲロー", "カイム", "ぎしんあん鬼", "ガ鬼", "あまのじゃく", "ヒキコウモリ", "ドジコウモリ", "ヤドコウモリ", "かりパックン", "泥ボックン", "まてんし", "ひとまか仙人", "りもこんかくし", "ジコチュウ", "ネクラマテング", "ヨミテング", "リー夫人", "ミツマタノヅチ", "ガブニャン", "魔ガサス", "ウ魔", "デビビル", "デビビラン", "虫歯伯爵", "百々目鬼", "きらめき鬼", "ドケチング", "ヤミまろ", "どんどろ"] },
+        { tribe: "ブキミー族", members: ["イガイガグリ", "チクチクウニ", "じめりんぼう", "雨ふらし", "こおりんぼう", "化けあられ", "たらりん", "ヨコドリ", "ぶんぶん鳥", "はらおドリ", "おともらし", "爆音ならし", "トホホギス", "ブカッコウ", "死神鳥", "じんめん犬", "かおベロス", "三途の犬", "けうけげん", "ふさふさん", "認MEN", "ドンヨリーヌ", "口だけおんな", "おつぼね様", "じがじぃさん", "のらりくらり", "おならず者", "へこ鬼神", "花子さん", "呪野花子", "のぼせトンマン", "おすべり様", "おしっしょう", "しわくちゃん", "老いらん", "ふじみ御前", "フゥミン", "おねむの精", "土蜘蛛", "女郎蜘蛛"] },
+        { tribe: "ニョロロン族", members: ["ねちがえる", "ツチノコ", "フクリュウ", "ツチノコパンダ", "からみぞん", "こんがらギャル", "笑ウツボ", "歌ウナギ", "大蛇のツボ", "キライギョ", "ゾウオ", "ギャクジョウオ", "おもいだスッポン", "おもいだ神", "ムカムカデ", "激ドラゴン", "りゅーくん", "龍神", "青龍", "にんぎょ", "八百比丘尼", "イザナミ", "ろくろ首", "ボー坊", "しどろもどろ", "ミチクサメ", "トーシロザメ", "ムダヅカイ", "はらわシェル", "ナガバナ", "ナガバナナ", "ホリュウ", "つられたろう丸", "しきるん蛇", "すねスネーク", "まむし行司", "オロチ", "影オロチ"] },
+        { tribe: "その他", members: ["ブシニャン", "しゅらコマ", "山吹鬼", "ネタバレリーナ", "花さか爺", "うんちく魔", "イケメン犬", "やまタン", "サファイニャン", "エメラルニャン", "ルビーニャン", "トパニャン", "ダイヤニャン", "メロンニャン", "ミカンニャン", "キウイニャン", "ブドウニャン", "イチゴニャン", "スイカニャン", "ロボガッパ", "ロボコマ", "ロボG", "ロボメン犬", "ロボノコ", "ロボりゅーくん", "ワンダーニャン", "ロボニャンF型", "セーラーニャン", "マスクドニャーン", "フユニャン", "ダークニャン", "ジバコマ", "ジェットニャン", "厄怪", "不怪", "豪怪", "難怪", "破怪", "あかなめ・怪", "泥田坊・怪", "えんらえんら・怪", "河童・怪", "から傘お化け・怪", "ざしきわらし・怪", "くだん・怪", "けうけげん・怪", "にんぎょ・怪", "ろくろ首・怪", "ジンギスカン", "チンギスハン", "寝ブタ", "ねぶた", "江戸っ子パンダ", "大江戸忍者パンダ", "ひつま武士", "ひまつ武士", "たこやっ鬼", "たこや鬼神", "砂ン丘入道", "ノー砂ン丘入道", "すもうどん", "横砂うどん", "あっそう山", "あそっ火山", "ウキウキビ", "トキメキビ", "ハナホ人", "妖怪ガッツK", "妖怪ガッツF", "ジバニャンS", "コマさんS", "コマじろうS", "ヤミキュウビ", "ヒカリオロチ", "赤鬼", "青鬼", "黒鬼"] },
+    ];
 
-            let totalYokaiCount = 0;
+    // 保存ファイルの形式。過去に保存した JSON を読み込めるよう変更しないこと。
+    const SAVE_FORMAT_VERSION = 'yokai-checker-v2';
+    const SAVE_FILE_NAME = 'yokai_data.json';
 
-            // 妖怪リストをHTMLとして生成
-            yokaiData.forEach(tribe => {
-                const tribeSection = document.createElement('div');
-                tribeSection.className = 'bg-white p-4 rounded-lg shadow-md';
+    // チェック時に付け外しするクラス
+    const CHECKED_ITEM_CLASSES = ['checked', 'bg-green-100', 'border-green-400'];
+    const CHECKED_NAME_CLASSES = ['line-through', 'text-gray-500'];
 
-                const tribeTitle = document.createElement('h2');
-                tribeTitle.className = 'text-2xl font-bold mb-4 pb-2 border-b-2 border-red-500';
-                tribeTitle.textContent = tribe.tribe;
-                tribeSection.appendChild(tribeTitle);
+    document.addEventListener('DOMContentLoaded', () => {
+        const listContainer = document.getElementById('yokai-list');
+        const saveButton = document.getElementById('save-button');
+        const loadInput = document.getElementById('load-input');
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const progressBarTrack = document.getElementById('progress-bar-track');
+        const modal = document.getElementById('notification-modal');
+        const modalMessage = document.getElementById('notification-message');
+        const modalClose = document.getElementById('notification-close');
+        const tribeTemplate = document.getElementById('tribe-template');
+        const itemTemplate = document.getElementById('yokai-item-template');
 
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4';
+        // 妖怪ID -> { item, checkbox, name } の対応表。DOM を探し回らずに済ませるため。
+        const entries = new Map();
 
-                tribe.members.forEach(name => {
-                    totalYokaiCount++;
-                    const yokaiId = `${tribe.tribe}-${name}`;
+        /** 保存ファイルに書き出す妖怪の識別子。形式を変えると過去の保存が読めなくなる。 */
+        const yokaiId = (tribe, name) => `${tribe}-${name}`;
 
-                    const item = document.createElement('div');
-                    item.className = 'yokai-item bg-gray-50 p-3 rounded-lg border border-gray-200 transition-all duration-300';
-                    item.dataset.yokaiId = yokaiId;
-                    
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center cursor-pointer';
+        /** 妖怪リストを生成し、entries を埋める。 */
+        function buildList() {
+            const fragment = document.createDocumentFragment();
 
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.className = 'h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500';
-                    
-                    const span = document.createElement('span');
-                    span.textContent = name;
-                    span.className = 'ml-3 text-sm md:text-base';
+            for (const { tribe, members } of YOKAI_TRIBES) {
+                const section = tribeTemplate.content.cloneNode(true);
+                section.querySelector('.tribe-name').textContent = tribe;
+                const grid = section.querySelector('.tribe-members');
 
-                    label.appendChild(checkbox);
-                    label.appendChild(span);
-                    item.appendChild(label);
-                    grid.appendChild(item);
-                });
+                for (const name of members) {
+                    const node = itemTemplate.content.cloneNode(true);
+                    const item = node.querySelector('.yokai-item');
+                    const nameEl = node.querySelector('.yokai-name');
+                    const id = yokaiId(tribe, name);
 
-                tribeSection.appendChild(grid);
-                yokaiListContainer.appendChild(tribeSection);
-            });
-
-            // 通知を表示する関数
-            const showNotification = (message) => {
-                modalMessage.textContent = message;
-                modal.classList.remove('hidden');
-            };
-
-            // 通知を閉じる
-            modalClose.addEventListener('click', () => {
-                modal.classList.add('hidden');
-            });
-            
-            // 達成率を更新する関数
-            const updateProgress = () => {
-                const checkedCount = document.querySelectorAll('.yokai-item.checked').length;
-                const percentage = totalYokaiCount > 0 ? (checkedCount / totalYokaiCount) * 100 : 0;
-                
-                progressText.textContent = `${checkedCount} / ${totalYokaiCount} (${percentage.toFixed(2)}%)`;
-                progressBar.style.width = `${percentage}%`;
-            };
-
-            // チェックボックスの状態が変更されたときの処理
-            yokaiListContainer.addEventListener('change', (event) => {
-                if (event.target.type === 'checkbox') {
-                    const listItem = event.target.closest('.yokai-item');
-                    if (event.target.checked) {
-                        listItem.classList.add('checked', 'bg-green-100', 'border-green-400');
-                        listItem.querySelector('span').classList.add('line-through', 'text-gray-500');
-                    } else {
-                        listItem.classList.remove('checked', 'bg-green-100', 'border-green-400');
-                         listItem.querySelector('span').classList.remove('line-through', 'text-gray-500');
-                    }
-                    updateProgress();
+                    nameEl.textContent = name;
+                    item.dataset.yokaiId = id;
+                    entries.set(id, { item, checkbox: node.querySelector('input'), name: nameEl });
+                    grid.appendChild(node);
                 }
-            });
 
-            // 「データを保存」ボタンがクリックされたときの処理
-            saveButton.addEventListener('click', () => {
-                const checkedItems = [];
-                const checkboxes = yokaiListContainer.querySelectorAll('input[type="checkbox"]');
-                
-                checkboxes.forEach(checkbox => {
-                    if (checkbox.checked) {
-                        const yokaiId = checkbox.closest('.yokai-item').dataset.yokaiId;
-                        checkedItems.push(yokaiId);
-                    }
-                });
+                fragment.appendChild(section);
+            }
 
-                const data = {
-                    version: "yokai-checker-v2",
-                    checked: checkedItems
-                };
+            listContainer.appendChild(fragment);
+        }
 
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'yokai_data.json';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showNotification('データを保存しました！');
-            });
+        /** チェック状態を DOM に反映する（見た目の切り替えはここに集約）。 */
+        function renderChecked(entry, checked) {
+            entry.checkbox.checked = checked;
+            for (const cls of CHECKED_ITEM_CLASSES) entry.item.classList.toggle(cls, checked);
+            for (const cls of CHECKED_NAME_CLASSES) entry.name.classList.toggle(cls, checked);
+        }
 
-            // 「データを読み込む」でファイルが選択されたときの処理
-            loadInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (!file) return;
+        /** チェック済みの妖怪IDの配列を返す。 */
+        const checkedIds = () =>
+            [...entries].filter(([, entry]) => entry.checkbox.checked).map(([id]) => id);
 
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = JSON.parse(e.target.result);
-                        if (data.version !== "yokai-checker-v2" || !Array.isArray(data.checked)) {
-                            showNotification('無効なデータファイルです。');
-                            return;
-                        }
-                        
-                        // 全てのチェックを一旦外す
-                        yokaiListContainer.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                            checkbox.checked = false;
-                            const item = checkbox.closest('.yokai-item');
-                            item.classList.remove('checked', 'bg-green-100', 'border-green-400');
-                            item.querySelector('span').classList.remove('line-through', 'text-gray-500');
-                        });
+        function updateProgress() {
+            const total = entries.size;
+            const checked = checkedIds().length;
+            const percentage = total > 0 ? (checked / total) * 100 : 0;
 
-                        // 読み込んだデータに基づいてチェックを入れる
-                        data.checked.forEach(yokaiId => {
-                            const listItem = yokaiListContainer.querySelector(`.yokai-item[data-yokai-id="${yokaiId}"]`);
-                            if (listItem) {
-                                const checkbox = listItem.querySelector('input[type="checkbox"]');
-                                checkbox.checked = true;
-                                listItem.classList.add('checked', 'bg-green-100', 'border-green-400');
-                                listItem.querySelector('span').classList.add('line-through', 'text-gray-500');
-                            }
-                        });
-                        
-                        updateProgress();
-                        showNotification('データを読み込みました！');
+            progressText.textContent = `${checked} / ${total} (${percentage.toFixed(2)}%)`;
+            progressBar.style.width = `${percentage}%`;
+            progressBarTrack.setAttribute('aria-valuenow', percentage.toFixed(2));
+        }
 
-                    } catch (error) {
-                        showNotification('ファイルの読み込みに失敗しました。');
-                        console.error(error);
-                    }
-                };
-                reader.readAsText(file);
-                event.target.value = '';
-            });
-            
-            // 初期状態の達成率を計算
+        /** 指定したIDだけをチェック済みにし、他は全て外す。 */
+        function applyCheckedIds(ids) {
+            const wanted = new Set(ids);
+            for (const [id, entry] of entries) renderChecked(entry, wanted.has(id));
+            updateProgress();
+        }
+
+        function showNotification(message) {
+            modalMessage.textContent = message;
+            modal.classList.remove('hidden');
+            modalClose.focus();
+        }
+
+        function hideNotification() {
+            modal.classList.add('hidden');
+        }
+
+        function saveToFile() {
+            const data = { version: SAVE_FORMAT_VERSION, checked: checkedIds() };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            link.href = url;
+            link.download = SAVE_FILE_NAME;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+
+            showNotification('データを保存しました！');
+        }
+
+        function loadFromFile(file) {
+            const reader = new FileReader();
+
+            reader.onerror = () => showNotification('ファイルの読み込みに失敗しました。');
+            reader.onload = (event) => {
+                let data;
+                try {
+                    data = JSON.parse(event.target.result);
+                } catch (error) {
+                    console.error(error);
+                    showNotification('ファイルの読み込みに失敗しました。');
+                    return;
+                }
+
+                const isValid = data !== null && typeof data === 'object' &&
+                    data.version === SAVE_FORMAT_VERSION && Array.isArray(data.checked);
+                if (!isValid) {
+                    showNotification('無効なデータファイルです。');
+                    return;
+                }
+
+                applyCheckedIds(data.checked);
+                showNotification('データを読み込みました！');
+            };
+
+            reader.readAsText(file);
+        }
+
+        buildList();
+        updateProgress();
+
+        listContainer.addEventListener('change', (event) => {
+            const item = event.target.closest('.yokai-item');
+            if (!item) return;
+
+            const entry = entries.get(item.dataset.yokaiId);
+            if (!entry) return;
+
+            renderChecked(entry, entry.checkbox.checked);
             updateProgress();
         });
+
+        saveButton.addEventListener('click', saveToFile);
+
+        loadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            // 同じファイルを続けて選び直せるように毎回リセットする。
+            event.target.value = '';
+            if (file) loadFromFile(file);
+        });
+
+        modalClose.addEventListener('click', hideNotification);
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) hideNotification();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') hideNotification();
+        });
+    });
     </script>
 
 </body>
