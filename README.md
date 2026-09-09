@@ -8,7 +8,33 @@
 
 ## ローカルで使う
 
-`public/index.html` をブラウザで直接開くだけ。
+`public/index.html` をブラウザで直接開くだけ。CSS も JS も埋め込み済みなので、
+サーバーもネット接続も要らない（フォントだけ Google Fonts から読む）。
+
+## ファイル構成
+
+| パス | 役割 |
+| --- | --- |
+| `public/index.html` | 本体。HTML・妖怪データ・JS・ビルド済みCSSが全部入っている |
+| `src/app.css` | Tailwind の入力CSS。独自スタイルはここに書く |
+| `tailwind.config.js` | Tailwind 設定 |
+| `scripts/build-css.mjs` | CSSをビルドして `public/index.html` に埋め込む |
+
+## CSSのビルド
+
+`public/index.html` の `<!-- tailwind:start -->` 〜 `<!-- tailwind:end -->` の中身は
+**自動生成**なので手で編集しない。Tailwind のクラスを足したり消したりしたら、
+
+```bash
+npm install   # 初回のみ
+npm run build
+```
+
+を実行して埋め込みCSSを作り直す。それ以外の部分（HTML構造・妖怪データ・JS）は
+`public/index.html` を直接編集してよい。
+
+`cdn.tailwindcss.com`（Play CDN）は使っていない。あれはブラウザ上でCSSを実行時に
+コンパイルするもので、本番では初回表示時にスタイル無しの状態が見えてしまうため。
 
 ## Cloudflare で公開する
 
@@ -18,12 +44,12 @@ Cloudflare Workers の [Static Assets](https://developers.cloudflare.com/workers
 ```bash
 npm install
 npx wrangler login   # 初回のみ
-npm run deploy
+npm run deploy       # CSSをビルドしてからデプロイする
 ```
 
 デプロイ先は `https://yokai-checker.<アカウントのサブドメイン>.workers.dev`。
 
-ローカルで本番と同じ配信を確認したいときは:
+本番と同じ配信をローカルで確認したいときは:
 
 ```bash
 npm run dev

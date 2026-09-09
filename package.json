@@ -2,10 +2,12 @@
   "name": "yokai-checker",
   "private": true,
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "build": "node scripts/build-css.mjs",
+    "dev": "npm run build && wrangler dev",
+    "deploy": "npm run build && wrangler deploy"
   },
   "devDependencies": {
+    "tailwindcss": "^3.4.19",
     "wrangler": "^4.130.0"
   }
 }
