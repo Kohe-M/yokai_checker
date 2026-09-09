@@ -19,6 +19,8 @@
 | `src/app.css` | Tailwind の入力CSS。独自スタイルはここに書く |
 | `tailwind.config.js` | Tailwind 設定 |
 | `scripts/build-css.mjs` | CSSをビルドして `public/index.html` に埋め込む |
+| `scripts/check.mjs` | 壊れやすい箇所の静的チェック（`npm run check`） |
+| `.github/workflows/ci.yml` | PRでのチェックと、main マージ時のデプロイ |
 
 ## CSSのビルド
 
@@ -41,6 +43,9 @@ npm run build
 Cloudflare Workers の [Static Assets](https://developers.cloudflare.com/workers/static-assets/) で
 `public/` をそのまま配信する。Worker スクリプトは無し（`wrangler.jsonc` に `main` を書いていない）。
 
+通常は下の「開発の流れ」のとおり **main にマージすると自動でデプロイされる**ので、
+手でデプロイする必要はない。手元から直接出したいときだけ:
+
 ```bash
 npm install
 npx wrangler login   # 初回のみ
@@ -54,6 +59,37 @@ npm run deploy       # CSSをビルドしてからデプロイする
 ```bash
 npm run dev
 ```
+
+## 開発の流れ
+
+main への直接 push はしない。ブランチを切って PR を作る。
+
+```bash
+git switch -c fix/something
+# 編集する。Tailwind のクラスを触ったら npm run build も実行する
+npm run check
+git commit -am "..."
+git push -u origin fix/something
+gh pr create
+```
+
+- **PR を作る / 更新する** → [CI](.github/workflows/ci.yml) の `check` が走る
+  - `npm run check`（保存形式の互換性、妖怪IDの重複、Play CDN の混入、必要な要素の有無）
+  - `npm run build` して `public/index.html` に差分が出ないこと（＝埋め込みCSSが最新か）
+  - `wrangler deploy --dry-run`（設定の検証。認証は不要）
+- **main にマージ** → `check` が通ったあと `deploy` が走り、Cloudflare に反映される
+
+### 初回だけ必要な設定
+
+デプロイに使う値を GitHub の
+`Settings > Secrets and variables > Actions` に **Repository secret** として登録する。
+
+| 名前 | 中身 |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Cloudflare ダッシュボードの My Profile > API Tokens で作る。テンプレート **Edit Cloudflare Workers**（または Workers Scripts の Edit 権限）でよい |
+| `CLOUDFLARE_ACCOUNT_ID` | `npx wrangler whoami` で表示される Account ID |
+
+API トークンは発行時に一度しか表示されない。GitHub に貼る以外の場所には残さないこと。
 
 ## 保存ファイルの形式
 

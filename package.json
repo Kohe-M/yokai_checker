@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "build": "node scripts/build-css.mjs",
+    "check": "node scripts/check.mjs",
     "dev": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy"
   },
