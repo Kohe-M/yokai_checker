@@ -1,0 +1,10 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "yokai-checker",
+  "compatibility_date": "2026-09-09",
+  // サーバー側の処理は無いので main（Workerスクリプト）は不要。
+  // public/ の中身をそのまま静的配信する。
+  "assets": {
+    "directory": "./public/"
+  }
+}
